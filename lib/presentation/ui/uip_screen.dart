@@ -1,6 +1,4 @@
-
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uip_tv_app/domain/controller/user_controller.dart';
@@ -21,13 +19,13 @@ class UipScreen extends StatelessWidget {
     Future<void> onRefresh() async {
       await controller.refreshData();
     }
+
     return Scaffold(
-      backgroundColor: AssetColorsPath.backgroundColors,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: RefreshIndicator(
-            onRefresh: onRefresh,
+        child: RefreshIndicator(
+          onRefresh: () => onRefresh(),
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -36,30 +34,34 @@ class UipScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 buildSearch(),
                 const SizedBox(height: 20),
-                const CategoriesText(
+                CategoriesText(
                   title: 'Categories',
                   subTitle: 'See More',
+                  onTap: () {},
                 ),
                 const SizedBox(height: 10),
                 buildMovieBrowser(controller),
                 const SizedBox(height: 10),
-                const CategoriesText(
+                CategoriesText(
                   title: 'Trending Movies',
                   subTitle: 'See More',
+                  onTap: () {},
                 ),
                 const SizedBox(height: 10),
                 buildTrendingMoviesSlider(controller),
                 const SizedBox(height: 10),
-                const CategoriesText(
+                CategoriesText(
                   title: 'Continue Watching',
                   subTitle: 'See More',
+                  onTap: () {},
                 ),
                 const SizedBox(height: 10),
                 buildContinueWatchingList(controller),
                 const SizedBox(height: 10),
-                const CategoriesText(
+                CategoriesText(
                   title: 'Recommended For You',
                   subTitle: 'See More',
+                  onTap: () {},
                 ),
                 const SizedBox(height: 10),
                 buildRecommendedSlider(controller),
@@ -72,12 +74,13 @@ class UipScreen extends StatelessWidget {
   }
 
   Widget buildDataProfile(UipController controller) {
+    log('photo:${controller.userImage.value}');
     return Row(
       children: [
         Expanded(
           child: Obx(() => RichText(
                 text: TextSpan(
-                  text: 'Hello ${controller.userName.value}\n',
+                  text: 'Hello, ${controller.userName.value}\n',
                   style: const TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.w600,
@@ -95,7 +98,11 @@ class UipScreen extends StatelessWidget {
                 ),
               )),
         ),
-        Obx(() => ProfileAvatar(userImage: controller.userImage.value)),
+        Obx(
+          () => ProfileAvatar(
+            userImage: controller.userImage.value,
+          ),
+        ),
       ],
     );
   }
@@ -168,13 +175,14 @@ class UipScreen extends StatelessWidget {
 
   Widget buildContinueWatchingList(UipController controller) {
     return Obx(() {
-      final listItems = controller.trendingMovies
-          .map((movie) => {
-                'title': movie.title ?? 'Unknown Title',
-                'imageUrl': movie.url ?? 'default_image_url.png',
-              })
-          .toList();
-
+      final listItems = controller.trendingMovies.map((movie) {
+        log('imageUrl: ${movie.url}');
+        return {
+          'title': movie.title ?? 'Unknown Title',
+          'imageUrl': movie.url ?? 'default_image_url.png',
+        };
+      }).toList();
+      log('List Items: $listItems');
       return CustomList(
         items: listItems,
       );
